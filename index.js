@@ -7,12 +7,13 @@ app.use(bodyParser.json());
 
 var timeserie = require('./series');
 
-for (var i = 0; i < timeserie.length; i++) {
-  var series = timeserie[i];
-  var now = Date.now();
+var now = Date.now();
+
+for (var i = timeserie.length -1; i >= 0; i--) {
+  var series = timeserie[i];  
   var decreaser = 0;
-  for (var y = 0; y < series.datapoints.length; y++) {
-    series.datapoints[y][1] = (now - decreaser);
+  for (var y = series.datapoints.length -1; y >= 0; y--) {
+    series.datapoints[y][1] = Math.round((now - decreaser) /1000) * 1000;
     decreaser += 50000;
   }
 }
@@ -51,7 +52,7 @@ app.all('/search', function(req, res){
     result.push(ts.target);
   });
 
-  res.send(JSON.stringify(result));
+  res.json(result);
   res.end();
 });
 
@@ -59,7 +60,7 @@ app.all('/annotations', function(req, res) {
   console.log(req.url);
   console.log(req.body);
 
-  res.send(JSON.stringify(annotations));
+  res.json(annotations);
   res.end();
 })
 
@@ -79,7 +80,7 @@ app.all('/query', function(req, res){
     });
   });
 
-  res.send(JSON.stringify(tsResult));
+  res.json(tsResult);
   res.end();
 });
 
