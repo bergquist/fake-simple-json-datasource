@@ -10,7 +10,7 @@ var timeserie = require('./series');
 var now = Date.now();
 
 for (var i = timeserie.length -1; i >= 0; i--) {
-  var series = timeserie[i];  
+  var series = timeserie[i];
   var decreaser = 0;
   for (var y = series.datapoints.length -1; y >= 0; y--) {
     series.datapoints[y][1] = Math.round((now - decreaser) /1000) * 1000;
@@ -33,7 +33,6 @@ var annotations = [
 
 var now = Date.now();
 var decreaser = 0;
-
 for (var i = 0;i < annotations.length; i++) {
   var anon = annotations[i];
 
@@ -41,7 +40,28 @@ for (var i = 0;i < annotations.length; i++) {
   decreaser += 1000000
 }
 
+var table =
+  {
+    columns: [{text: 'Time', type: 'time'}, {text: 'Country', type: 'string'}, {text: 'Number', type: 'number'}],
+    values: [
+      [ 1234567, 'SE', 123 ],
+      [ 1234567, 'DE', 231 ],
+      [ 1234567, 'US', 321 ],
+    ]
+  };
+
+
+var now = Date.now();
+var decreaser = 0;
+for (var i = 0;i < table.values.length; i++) {
+  var anon = table.values[i];
+
+  anon[0] = (now - decreaser);
+  decreaser += 1000000
+}
+
 app.all('/', function(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.send('I have a quest for you!');
   res.end();
 });
@@ -69,15 +89,18 @@ app.all('/query', function(req, res){
   console.log(req.body);
 
   var tsResult = [];
-
   _.each(req.body.targets, function(target) {
-    var k = _.filter(timeserie, function(t) {
-      return t.target === target.target;
-    });
+    if (target.type === 'table') {
+      tsResult.push(table);
+    } else {
+      var k = _.filter(timeserie, function(t) {
+        return t.target === target.target;
+      });
 
-    _.each(k, function(kk) {
-      tsResult.push(kk)
-    });
+      _.each(k, function(kk) {
+        tsResult.push(kk)
+      });
+    }
   });
 
   res.json(tsResult);
