@@ -49,6 +49,12 @@ var table =
       [ 1234567, 'US', 321 ],
     ]
   };
+  
+function setCORSHeaders(res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST");
+  res.setHeader("Access-Control-Allow-Headers", "accept, content-type");  
+}
 
 
 var now = Date.now();
@@ -61,12 +67,13 @@ for (var i = 0;i < table.values.length; i++) {
 }
 
 app.all('/', function(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  setCORSHeaders(res);
   res.send('I have a quest for you!');
   res.end();
 });
 
 app.all('/search', function(req, res){
+  setCORSHeaders(res);
   var result = [];
   _.each(timeserie, function(ts) {
     result.push(ts.target);
@@ -77,6 +84,7 @@ app.all('/search', function(req, res){
 });
 
 app.all('/annotations', function(req, res) {
+  setCORSHeaders(res);
   console.log(req.url);
   console.log(req.body);
 
@@ -85,6 +93,7 @@ app.all('/annotations', function(req, res) {
 })
 
 app.all('/query', function(req, res){
+  setCORSHeaders(res);
   console.log(req.url);
   console.log(req.body);
 
