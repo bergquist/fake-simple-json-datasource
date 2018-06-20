@@ -6,6 +6,7 @@ var app = express();
 app.use(bodyParser.json());
 
 var timeserie = require('./series');
+var countryTimeseries = require('./country-series');
 
 var now = Date.now();
 
@@ -29,6 +30,16 @@ var annotations = [
   { annotation: annotation, "title": "Donlad trump is kinda funny", "time": 1450754160000, text: "teeext", tags: "taaags" },
   { annotation: annotation, "title": "Wow he really won", "time": 1450754160000, text: "teeext", tags: "taaags" },
   { annotation: annotation, "title": "When is the next ", "time": 1450754160000, text: "teeext", tags: "taaags" }
+];
+
+var tagKeys = [
+  {"type":"string","text":"Country"}
+];
+
+var countryTagValues = [
+  {'text': 'SE'},
+  {'text': 'DE'},
+  {'text': 'US'}
 ];
 
 var now = Date.now();
@@ -90,7 +101,7 @@ app.all('/annotations', function(req, res) {
 
   res.json(annotations);
   res.end();
-})
+});
 
 app.all('/query', function(req, res){
   setCORSHeaders(res);
@@ -98,11 +109,17 @@ app.all('/query', function(req, res){
   console.log(req.body);
 
   var tsResult = [];
+  let fakeData = timeserie;
+
+  if (req.body.adhocFilters && req.body.adhocFilters.length > 0) {
+    fakeData = countryTimeseries;
+  }
+
   _.each(req.body.targets, function(target) {
     if (target.type === 'table') {
       tsResult.push(table);
     } else {
-      var k = _.filter(timeserie, function(t) {
+      var k = _.filter(fakeData, function(t) {
         return t.target === target.target;
       });
 
@@ -111,8 +128,30 @@ app.all('/query', function(req, res){
       });
     }
   });
-
+ 
   res.json(tsResult);
+  res.end();
+});
+
+app.all('/tag[\-]keys', function(req, res) {
+  setCORSHeaders(res);
+  console.log(req.url);
+  console.log(req.body);
+
+  res.json(tagKeys);
+  res.end();
+});
+
+app.all('/tag[\-]values', function(req, res) {
+  setCORSHeaders(res);
+  console.log(req.url);
+  console.log(req.body);
+
+  if (req.body.key == 'City') {
+    res.json(cityTagValues);
+  } else if (req.body.key == 'Country') {
+    res.json(countryTagValues);
+  }
   res.end();
 });
 
